@@ -1,0 +1,23 @@
+  logging:
+    level:
+      root: INFO
+  spring:
+    jpa:
+      debug: true
+      database: mysql
+      hibernate:
+        #      enable_lazy_load_no_trans: true
+        ddl-auto: update
+      properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+    datasource:
+      hikari:
+        maximum-pool-size: 1
+      platform: mysql
+      url: jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7537820
+      username: sql7537820
+      password: eSXakk5HSm
+      driverClassName: com.mysql.cj.jdbc.Driver
+
+    main:
+      web-application-type: none
