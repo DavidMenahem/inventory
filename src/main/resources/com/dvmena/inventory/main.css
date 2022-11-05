@@ -1,0 +1,8 @@
+#add_category, #add_sub_category, #add_item{
+    -fx-padding: 20px;
+    -fx-background-insets:10 10 10 10;
+    -fx-background-radius: 5.0;
+    -fx-border-width: 1px;
+    -fx-border-color: blue;
+    -fx-margin: 20px;
+}

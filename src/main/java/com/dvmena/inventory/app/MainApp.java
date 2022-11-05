@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -24,15 +25,15 @@ public class MainApp extends Application {
     private Parent root;
 
     @FXML
-    Label lblDetailsName;
+    private ComboBox subCategories;
     @Override
     public void start(Stage stage){
         Scene scene = new Scene(root);
-        //scene.getStylesheets().add(this.getClass().getResource("/com/dvmena/followprojects/myProjects.css").toExternalForm());
-        //Image image = new Image(this.getClass().getResourceAsStream("images/icon.png"));
-        //stage.getIcons().add(image);
+        scene.getStylesheets().add(this.getClass().getResource("/com/dvmena/inventory/main.css").toExternalForm());
+        Image image = new Image(this.getClass().getResource("/com/dvmena/inventory/images/icon.png").toExternalForm());
+        stage.getIcons().add(image);
         stage.setTitle("Inventory");
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
         this.applicationContext.publishEvent(new StageReadyEvent(stage));

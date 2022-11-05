@@ -12,7 +12,7 @@
 
     datasource:
       hikari:
-        maximum-pool-size: 1
+        maximum-pool-size: 5
       platform: mysql
       url: jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7537820
       username: sql7537820

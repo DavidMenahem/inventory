@@ -2,7 +2,50 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<HBox alignment="TOP_LEFT" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.dvmena.inventory.controller.InventoryController">
-    <Button fx:id="add_category"/>
-</VBox>
+    <VBox spacing="20">
+    <Button fx:id="add_category" prefWidth="200" text="Add Category" onAction="#add_category"/>
+    <Button fx:id="add_sub_category" prefWidth="200" text="Add Sub Category" onAction="#add_sub_category"/>
+    <Button fx:id="add_item" prefWidth="200" text="Add Item"/>
+    <HBox>
+        <Label>
+            <padding>
+                <Insets right="10"/>
+            </padding>
+                    Select Category</Label>
+        <ComboBox fx:id="categories" promptText="select category"></ComboBox>
+    </HBox>
+    <HBox>
+        <Label>
+            <padding>
+                <Insets right="10"/>
+            </padding>
+            Select sub Category</Label>
+        <ComboBox fx:id="subCategories" promptText="select sub category"></ComboBox>
+    </HBox>
+    </VBox>
+    <TableView fx:id="table">
+        <TableColumn prefWidth="150" fx:id="table_category" text="category"/>
+        <TableColumn prefWidth="150" fx:id="table_sub_category" text="Sub Category"/>
+        <TableColumn prefWidth="150" fx:id="table_name" text="Name"/>
+        <TableColumn prefWidth="150" fx:id="table_number" text="Number"/>
+        <TableColumn prefWidth="150" fx:id="table_amount" text="Amount"/>
+    </TableView>
+    <VBox>
+        <HBox><Label>Category:</Label><Label fx:id="category"></Label></HBox>
+        <HBox><Label>Sub Category:</Label><Label fx:id="sub_category"></Label></HBox>
+        <HBox><Label>Name:</Label><Label fx:id="name"></Label></HBox>
+        <HBox><Label>Description:</Label><Label fx:id="description"></Label></HBox>
+        <HBox><Label>Number:</Label><Label fx:id="number"></Label></HBox>
+        <HBox><Label>Amount:</Label><Label fx:id="amount"></Label></HBox>
+        <HBox><Label>Symbol:</Label><Label fx:id="symbol"></Label></HBox>
+        <HBox><Label>Condition:</Label><Label fx:id="state"></Label></HBox>
+    </VBox>
+</HBox>
