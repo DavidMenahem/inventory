@@ -1,8 +1,10 @@
 package com.dvmena.inventory.controller;
 
 import com.dvmena.inventory.model.Category;
+import com.dvmena.inventory.model.Product;
 import com.dvmena.inventory.model.SubCategory;
 import com.dvmena.inventory.service.CategoryService;
+import com.dvmena.inventory.service.ProductService;
 import com.dvmena.inventory.service.SubCategoryService;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -15,14 +17,22 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import javax.swing.event.ChangeEvent;
+import javax.sql.rowset.serial.SerialBlob;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 @Component
@@ -32,6 +42,9 @@ public class InventoryController implements Initializable {
     private final CategoryService categoryService;
 
     private final SubCategoryService subCategoryService;
+
+    private final ProductService productService;
+
     @FXML
     private ComboBox<Category> categories;
 
@@ -41,6 +54,17 @@ public class InventoryController implements Initializable {
     private ComboBox<SubCategory> subCategories;
 
     private ObservableList<SubCategory> subCategoryList;
+
+    @FXML
+    private TableView<Product> table;
+    @FXML
+    private TableColumn<Product, String> tableName;
+    @FXML
+    private TableColumn<Product,String> tableSerialNumber;
+    @FXML
+    private TableColumn<Product, String> tableAmount;
+    //TableView.TableViewSelectionModel<Product> tableViewSelectionModel;
+    Blob image;
     public void add_category(ActionEvent event){
         Group root = new Group();
 
@@ -122,19 +146,153 @@ public class InventoryController implements Initializable {
         });
     }
 
+    public void add_item(){
+        Label title = new Label("Add Item");
+        title.setFont(new Font("Arial",30));
+        ComboBox categoryComBox = new ComboBox();
+        categoryComBox.setItems(categoryList);
+
+        ComboBox subCategoryComBox = new ComboBox();
+        categoryComBox.valueProperty().addListener(new ChangeListener<Category>(){
+            @Override
+            public void changed(ObservableValue<? extends Category> observable, Category oldValue, Category newValue) {
+                subCategoryList = FXCollections.observableArrayList(
+                        subCategoryService.findByCategoryId(newValue.getId())
+                );
+                subCategoryComBox.setItems(subCategoryList);
+            }
+        });
+
+        VBox comBoxesVBox = new VBox();
+        comBoxesVBox.setAlignment(Pos.CENTER);
+        comBoxesVBox.getChildren().addAll(categoryComBox,subCategoryComBox);
+
+        HBox boxName = new HBox();
+        Label lblName = new Label("Name:");
+        TextField txtName = new TextField();
+        boxName.setAlignment(Pos.CENTER);
+        boxName.getChildren().addAll(lblName,txtName);
+
+        HBox boxDescription = new HBox();
+        Label lblDescription = new Label("Description:");
+        TextField txtDescription = new TextField();
+        boxDescription.setAlignment(Pos.CENTER);
+        boxDescription.getChildren().addAll(lblDescription,txtDescription);
+
+        HBox boxAmount = new HBox();
+        Label lblAmount = new Label("Amount:");
+        TextField txtAmount = new TextField();
+        boxAmount.setAlignment(Pos.CENTER);
+        boxAmount.getChildren().addAll(lblAmount,txtAmount);
+
+        HBox boxSerialNumber = new HBox();
+        Label lblSerialNumber = new Label("Serial Number:");
+        TextField txtSerialNumber = new TextField();
+        boxSerialNumber.setAlignment(Pos.CENTER);
+        boxSerialNumber.getChildren().addAll(lblSerialNumber,txtSerialNumber);
+
+        HBox boxSymbol = new HBox();
+        Label lblSymbol = new Label("Symbol:");
+        TextField txtSymbol = new TextField();
+        boxSymbol.setAlignment(Pos.CENTER);
+        boxSymbol.getChildren().addAll(lblSymbol,txtSymbol);
+
+        HBox boxState = new HBox();
+        Label lblState = new Label("Condition:");
+        TextField txtState = new TextField();
+        boxState.setAlignment(Pos.CENTER);
+        boxState.getChildren().addAll(lblState,txtState);
+
+        Label lblFile = new Label();
+
+        Button fileButton = new Button("Upload Image");
+        fileButton.setOnAction(event-> {
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Open Resource File");
+                    File file = fileChooser.showOpenDialog(null);
+                    if (file != null) {
+                        lblFile.setText(file.getName());
+                    }
+                    byte[] fileBytes = null;
+                    if (file != null) {
+                        try {
+                            fileBytes = new FileInputStream(file).readAllBytes();
+                            if (fileBytes != null) {
+                                image = new SerialBlob(fileBytes);
+                            }
+                        } catch (IOException | SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+        HBox fileBox = new HBox();
+        fileBox.setAlignment(Pos.CENTER);
+        fileBox.getChildren().addAll(fileButton,lblFile);
+
+        Button save = new Button("Save");
+        VBox formBox = new VBox();
+        formBox.setAlignment(Pos.CENTER);
+        formBox.getChildren().addAll(title,comBoxesVBox,boxName,boxDescription,boxAmount
+        ,boxSerialNumber,boxSymbol,boxState,fileBox,save);
+
+        Group root = new Group();
+        root.getChildren().add(formBox);
+        Scene scene = new Scene(root,500,500);
+        Stage stage = new Stage();
+        stage.setTitle("Add Item");
+        stage.setScene(scene);
+        stage.show();
+
+        save.setOnAction(e->{
+
+            Product product = Product.builder()
+                    .name(txtName.getText())
+                    .description(txtDescription.getText())
+                    .amount(Integer.parseInt(txtAmount.getText()))
+                    .serialNumber(txtSerialNumber.getText())
+                    .symbol(txtSymbol.getText())
+                    .state(txtState.getText())
+                    .image(image)
+                    .build();
+
+            productService.add(product);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Item added");
+            alert.setHeaderText("Item added");
+            alert.setContentText("Item: " + product.getName() + " has been added");
+            alert.show();
+        });
+    }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        table.getColumns().add(tableName);
+        table.getColumns().add(tableSerialNumber);
+        table.getColumns().add(tableAmount);
         categoryList = FXCollections.observableArrayList(categoryService.findAll());
         categories.getItems().addAll(categoryList);
         categories.valueProperty().addListener(new ChangeListener<Category>(){
-
-
             @Override
             public void changed(ObservableValue<? extends Category> observable, Category oldValue, Category newValue) {
                 subCategoryList = FXCollections.observableArrayList(
                         subCategoryService.findByCategoryId(newValue.getId())
                 );
                 subCategories.setItems(subCategoryList);
+            }
+        });
+        subCategories.valueProperty().addListener(new ChangeListener<SubCategory>(){
+            @Override
+            public void changed(ObservableValue<? extends SubCategory> observable, SubCategory oldValue, SubCategory newValue) {
+                ObservableList<Product> productObservableList = FXCollections.observableList(
+                        productService.findAllBySubCategory(newValue)
+                );
+
+                if(productObservableList.size()>0) {
+                    tableName.setCellValueFactory(new PropertyValueFactory<>("name"));
+                    tableSerialNumber.setCellValueFactory(new PropertyValueFactory<>("serialNumber"));
+                    tableAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+                    table.setItems(productObservableList);
+                }
             }
         });
     }

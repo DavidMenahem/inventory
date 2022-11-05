@@ -13,7 +13,7 @@
     <VBox spacing="20">
     <Button fx:id="add_category" prefWidth="200" text="Add Category" onAction="#add_category"/>
     <Button fx:id="add_sub_category" prefWidth="200" text="Add Sub Category" onAction="#add_sub_category"/>
-    <Button fx:id="add_item" prefWidth="200" text="Add Item"/>
+    <Button fx:id="add_item" prefWidth="200" text="Add Item" onAction="#add_item"/>
     <HBox>
         <Label>
             <padding>
@@ -32,11 +32,9 @@
     </HBox>
     </VBox>
     <TableView fx:id="table">
-        <TableColumn prefWidth="150" fx:id="table_category" text="category"/>
-        <TableColumn prefWidth="150" fx:id="table_sub_category" text="Sub Category"/>
-        <TableColumn prefWidth="150" fx:id="table_name" text="Name"/>
-        <TableColumn prefWidth="150" fx:id="table_number" text="Number"/>
-        <TableColumn prefWidth="150" fx:id="table_amount" text="Amount"/>
+        <TableColumn prefWidth="150" fx:id="tableName" text="Name"/>
+        <TableColumn prefWidth="150" fx:id="tableSerialNumber" text="Serial Number"/>
+        <TableColumn prefWidth="150" fx:id="tableAmount" text="Amount"/>
     </TableView>
     <VBox>
         <HBox><Label>Category:</Label><Label fx:id="category"></Label></HBox>

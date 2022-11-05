@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Blob;
 
 @Entity
 @Table(name = "products")
@@ -37,6 +38,9 @@ public class Product {
 
     @Column(name="state",nullable = false)
     private String state;
+
+    @Lob
+    private Blob image;
 
     public long getId() {
         return id;
@@ -100,6 +104,14 @@ public class Product {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public Blob getImage() {
+        return image;
+    }
+
+    public void setImage(Blob image) {
+        this.image = image;
     }
 
     @Override
