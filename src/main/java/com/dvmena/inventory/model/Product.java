@@ -18,7 +18,7 @@ public class Product {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name="sub_category_id")
+    @JoinColumn(name="subCategory_id")
     private SubCategory subCategory;
 
     @Column(name="name",nullable = false)

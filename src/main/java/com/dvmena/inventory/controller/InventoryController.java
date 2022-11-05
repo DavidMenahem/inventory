@@ -18,6 +18,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -30,15 +32,18 @@ import javax.sql.rowset.serial.SerialBlob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Component
 @RequiredArgsConstructor
 public class InventoryController implements Initializable {
 
+    private Long productId;
     private final CategoryService categoryService;
 
     private final SubCategoryService subCategoryService;
@@ -63,8 +68,30 @@ public class InventoryController implements Initializable {
     private TableColumn<Product,String> tableSerialNumber;
     @FXML
     private TableColumn<Product, String> tableAmount;
-    //TableView.TableViewSelectionModel<Product> tableViewSelectionModel;
+
+    TableView.TableViewSelectionModel<Product> tableViewSelectionModel;
     Blob image;
+
+    @FXML
+    private Label category;
+    @FXML
+    private Label subCategory;
+    @FXML
+    private Label name;
+    @FXML
+    private Label description;
+    @FXML
+    private Label serialNumber;
+    @FXML
+    private Label amount;
+    @FXML
+    private Label symbol;
+    @FXML
+    private Label state;
+    @FXML
+    private ImageView img;
+    @FXML
+    private Button deleteProduct;
     public void add_category(ActionEvent event){
         Group root = new Group();
 
@@ -243,9 +270,11 @@ public class InventoryController implements Initializable {
         stage.setScene(scene);
         stage.show();
 
-        save.setOnAction(e->{
 
+        //add item
+        save.setOnAction(e->{
             Product product = Product.builder()
+                    .subCategory((SubCategory) subCategoryComBox.getValue())
                     .name(txtName.getText())
                     .description(txtDescription.getText())
                     .amount(Integer.parseInt(txtAmount.getText()))
@@ -266,33 +295,84 @@ public class InventoryController implements Initializable {
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //add column to table
         table.getColumns().add(tableName);
         table.getColumns().add(tableSerialNumber);
         table.getColumns().add(tableAmount);
         categoryList = FXCollections.observableArrayList(categoryService.findAll());
-        categories.getItems().addAll(categoryList);
-        categories.valueProperty().addListener(new ChangeListener<Category>(){
-            @Override
-            public void changed(ObservableValue<? extends Category> observable, Category oldValue, Category newValue) {
-                subCategoryList = FXCollections.observableArrayList(
-                        subCategoryService.findByCategoryId(newValue.getId())
-                );
+        if(categoryList.size() > 0) {
+            categories.getItems().addAll(categoryList);
+        }
+        categoryList.removeAll();
+
+        //select sub categorise based on category
+        categories.valueProperty().addListener((observable, oldValue, newValue) -> {
+
+            subCategoryList = FXCollections.observableArrayList(
+                    subCategoryService.findByCategoryId(newValue.getId())
+            );
+            if(subCategoryList.size() > 0) {
                 subCategories.setItems(subCategoryList);
             }
+            subCategoryList.removeAll();
         });
-        subCategories.valueProperty().addListener(new ChangeListener<SubCategory>(){
-            @Override
-            public void changed(ObservableValue<? extends SubCategory> observable, SubCategory oldValue, SubCategory newValue) {
-                ObservableList<Product> productObservableList = FXCollections.observableList(
-                        productService.findAllBySubCategory(newValue)
-                );
 
-                if(productObservableList.size()>0) {
-                    tableName.setCellValueFactory(new PropertyValueFactory<>("name"));
-                    tableSerialNumber.setCellValueFactory(new PropertyValueFactory<>("serialNumber"));
-                    tableAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
-                    table.setItems(productObservableList);
+        //populate table based on sub category
+        subCategories.valueProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<Product> productObservableList = FXCollections.observableList(
+                    productService.findBySubCategoryId(newValue.getId())
+            );
+            table.getItems().clear();
+            if(productObservableList.size() > 0) {
+                tableName.setCellValueFactory(new PropertyValueFactory<>("name"));
+                tableSerialNumber.setCellValueFactory(new PropertyValueFactory<>("serialNumber"));
+                tableAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+                table.setItems(productObservableList);
+            }
+        });
+
+        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            Product product = newSelection;
+            if(product!=null) {
+                productId = product.getId();
+            }else{
+                productId = null;
+            }
+            category.setText(product.getSubCategory().getCategory().getName());
+            subCategory.setText(product.getSubCategory().getName());
+            name.setText(product.getName());
+            description.setText(product.getDescription());
+            serialNumber.setText(product.getSerialNumber());
+            amount.setText(String.valueOf(product.getAmount()));
+            symbol.setText(product.getSymbol());
+            state.setText(product.getState());
+            try {
+                InputStream inputStream = product.getImage().getBinaryStream();
+                img.setImage(new Image(inputStream));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        deleteProduct.setOnAction(e->{
+            if(productId!=null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Delete product");
+                alert.setContentText("Are you sure you want to delete this item?");
+                Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                Optional<ButtonType> result =  alert.showAndWait();
+                if(result.isPresent() && result.get() == ButtonType.OK){
+
+                    productService.deleteProduct(productId);
+                    alert1.setContentText("Deleted product");
+                    alert1.setContentText("Product deleted");
+                    alert1.show();
+                }else{
+                    alert1.setHeaderText("Product not deleted");
+                    alert1.setContentText("Product not deleted");
+                    alert1.show();
                 }
+
             }
         });
     }

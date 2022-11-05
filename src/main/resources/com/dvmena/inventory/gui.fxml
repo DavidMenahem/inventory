@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.image.ImageView?>
 <HBox alignment="TOP_LEFT" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.dvmena.inventory.controller.InventoryController">
     <VBox spacing="20">
@@ -37,13 +38,23 @@
         <TableColumn prefWidth="150" fx:id="tableAmount" text="Amount"/>
     </TableView>
     <VBox>
-        <HBox><Label>Category:</Label><Label fx:id="category"></Label></HBox>
-        <HBox><Label>Sub Category:</Label><Label fx:id="sub_category"></Label></HBox>
-        <HBox><Label>Name:</Label><Label fx:id="name"></Label></HBox>
-        <HBox><Label>Description:</Label><Label fx:id="description"></Label></HBox>
-        <HBox><Label>Number:</Label><Label fx:id="number"></Label></HBox>
-        <HBox><Label>Amount:</Label><Label fx:id="amount"></Label></HBox>
-        <HBox><Label>Symbol:</Label><Label fx:id="symbol"></Label></HBox>
-        <HBox><Label>Condition:</Label><Label fx:id="state"></Label></HBox>
+        <HBox><Label>Category:</Label>
+            <Label fx:id="category"/></HBox>
+        <HBox><Label>Sub Category:</Label>
+            <Label fx:id="subCategory"/></HBox>
+        <HBox><Label>Name:</Label>
+            <Label fx:id="name"/></HBox>
+        <HBox><Label>Description:</Label>
+            <Label fx:id="description"/></HBox>
+        <HBox><Label>Number:</Label>
+            <Label fx:id="serialNumber"/></HBox>
+        <HBox><Label>Amount:</Label>
+            <Label fx:id="amount"/></HBox>
+        <HBox><Label>Symbol:</Label>
+            <Label fx:id="symbol"/></HBox>
+        <HBox><Label>Condition:</Label>
+            <Label fx:id="state"/></HBox>
+        <ImageView fx:id="img" fitWidth="300" fitHeight="300"/>
     </VBox>
+    <Button fx:id="deleteProduct">Delete Item</Button>
 </HBox>

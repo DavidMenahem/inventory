@@ -17,7 +17,11 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<Product> findAllBySubCategory(SubCategory subCategory){
-        return productRepository.findBySubCategory(subCategory);
+    public List<Product> findBySubCategoryId(long id){
+        return productRepository.findBySubCategoryId(id);
+    }
+
+    public void deleteProduct(long id){
+        productRepository.deleteById(id);
     }
 }
