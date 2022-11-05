@@ -23,9 +23,6 @@ public class SubCategory {
     @Column(name="name",nullable = false)
     private String name;
 
-    @Column(name="description",nullable = false)
-    private String description;
-
     public long getId() {
         return id;
     }
@@ -50,21 +47,9 @@ public class SubCategory {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     @Override
     public String toString() {
-        return "SubCategory{" +
-                "id=" + id +
-                ", category=" + category.getName() +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return this.name;
     }
 }

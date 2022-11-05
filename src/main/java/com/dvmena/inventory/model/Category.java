@@ -18,9 +18,6 @@ public class Category {
     @Column(name="name",nullable = false)
     private String name;
 
-    @Column(name="description",nullable = false)
-    private String description;
-
     public long getId() {
         return id;
     }
@@ -37,11 +34,8 @@ public class Category {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public String toString() {
+        return this.name;
     }
 }
