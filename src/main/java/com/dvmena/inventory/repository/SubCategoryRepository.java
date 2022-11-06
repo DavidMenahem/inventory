@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface SubCategoryRepository extends JpaRepository<SubCategory,Long> {
     List<SubCategory> findByCategoryId(long id);
+
+    void deleteByCategoryId(long id);
 }

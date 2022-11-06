@@ -68,8 +68,6 @@ public class InventoryController implements Initializable {
     private TableColumn<Product,String> tableSerialNumber;
     @FXML
     private TableColumn<Product, String> tableAmount;
-
-    TableView.TableViewSelectionModel<Product> tableViewSelectionModel;
     Blob image;
 
     @FXML
@@ -91,7 +89,13 @@ public class InventoryController implements Initializable {
     @FXML
     private ImageView img;
     @FXML
+    private Button deleteCategory;
+    @FXML
+    private Button deleteSubCategory;
+    @FXML
     private Button deleteProduct;
+
+
     public void add_category(ActionEvent event){
         Group root = new Group();
 
@@ -270,7 +274,6 @@ public class InventoryController implements Initializable {
         stage.setScene(scene);
         stage.show();
 
-
         //add item
         save.setOnAction(e->{
             Product product = Product.builder()
@@ -331,29 +334,70 @@ public class InventoryController implements Initializable {
             }
         });
 
-        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            Product product = newSelection;
-            if(product!=null) {
-                productId = product.getId();
+        if(table.getItems().size() > 0) {
+            table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                Product product = newSelection;
+                if (product != null) {
+                    productId = product.getId();
+                } else {
+                    productId = null;
+                }
+                category.setText(product.getSubCategory().getCategory().getName());
+                subCategory.setText(product.getSubCategory().getName());
+                name.setText(product.getName());
+                description.setText(product.getDescription());
+                serialNumber.setText(product.getSerialNumber());
+                amount.setText(String.valueOf(product.getAmount()));
+                symbol.setText(product.getSymbol());
+                state.setText(product.getState());
+                try {
+                    InputStream inputStream = product.getImage().getBinaryStream();
+                    img.setImage(new Image(inputStream));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        //delete category
+        deleteCategory.setOnAction(e->{
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText("Delete category");
+            alert.setContentText("Are you sure you want to delete category " + categories.getValue().getName() + "?");
+            Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+            Optional<ButtonType> result = alert.showAndWait();
+            if(result.isPresent() && result.get() == ButtonType.OK){
+                subCategoryService.deleteByCategoryId(categories.getValue().getId());
+                categoryService.delete(categories.getValue().getId());
+                alert1.setContentText("Category deleted");
+                alert1.show();
             }else{
-                productId = null;
+                alert1.setContentText("Category not deleted");
+                alert1.show();
             }
-            category.setText(product.getSubCategory().getCategory().getName());
-            subCategory.setText(product.getSubCategory().getName());
-            name.setText(product.getName());
-            description.setText(product.getDescription());
-            serialNumber.setText(product.getSerialNumber());
-            amount.setText(String.valueOf(product.getAmount()));
-            symbol.setText(product.getSymbol());
-            state.setText(product.getState());
-            try {
-                InputStream inputStream = product.getImage().getBinaryStream();
-                img.setImage(new Image(inputStream));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            categoryList = FXCollections.observableArrayList(categoryService.findAll());
+            if(categoryList.size() > 0) {
+                categories.getItems().addAll(categoryList);
             }
         });
+        //delete sub category
+        deleteSubCategory.setOnAction(e->{
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText("Delete sub category");
+            alert.setContentText("Are you sure you want to delete sub category " + subCategories.getValue().getName() + "?");
+            Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+            Optional<ButtonType> result = alert.showAndWait();
+            if(result.isPresent() && result.get() == ButtonType.OK){
 
+                subCategoryService.delete(subCategories.getValue().getId());
+                alert1.setContentText("Category deleted");
+                alert1.show();
+            }else{
+                alert1.setContentText("Category not deleted");
+                alert1.show();
+            }
+            subCategories.getItems().clear();
+        });
+        //delete product
         deleteProduct.setOnAction(e->{
             if(productId!=null) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -364,15 +408,12 @@ public class InventoryController implements Initializable {
                 if(result.isPresent() && result.get() == ButtonType.OK){
 
                     productService.deleteProduct(productId);
-                    alert1.setContentText("Deleted product");
                     alert1.setContentText("Product deleted");
                     alert1.show();
                 }else{
-                    alert1.setHeaderText("Product not deleted");
                     alert1.setContentText("Product not deleted");
                     alert1.show();
                 }
-
             }
         });
     }

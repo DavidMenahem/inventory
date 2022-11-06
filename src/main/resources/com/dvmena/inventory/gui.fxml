@@ -57,4 +57,6 @@
         <ImageView fx:id="img" fitWidth="300" fitHeight="300"/>
     </VBox>
     <Button fx:id="deleteProduct">Delete Item</Button>
+    <Button fx:id="deleteSubCategory">Delete Sub Category</Button>
+    <Button fx:id="deleteCategory">Delete Category</Button>
 </HBox>
